@@ -5,13 +5,18 @@ import time
 
 xpos1 = int(input())
 ypos1 = int(input())
-hp=3
+scor = 0
+hp = 3
+arrows = 3
 # задааем размер окна, создаем окно размера size
-size = [400, 400]
+size = [400, 460]
 window = pygame.display.set_mode(size)
 # задаем имя - в кавычках, т.к. текст - это строка
 pygame.display.set_caption('My second file')
+pygame.font.init()
+mf = pygame.font.Font(None, 60)
 
+Score = pygame.Surface([400, 60])
 screen = pygame.Surface(size)
 
 
@@ -38,13 +43,23 @@ hero = Sprite(xpos1, ypos1, 'WW.jpg')
 heart1 = Sprite(280, 360, 'Heart.png')
 heart2 = Sprite(320, 360, 'Heart.png')
 heart3 = Sprite(360, 360, 'Heart.png')
+arrow = Sprite(-100, -100, 'arrow.png')
+farrow1 = Sprite(0, 370, 'arrow.png')
+farrow2 = Sprite(7, 370, 'arrow.png')
+farrow3 = Sprite(14, 370, 'arrow.png')
+farrow4 = Sprite(21, 370, 'arrow.png')
+farrow5 = Sprite(28, 370, 'arrow.png')
+farrow6 = Sprite(35, 370, 'arrow.png')
+farrow7 = Sprite(42, 370, 'arrow.png')
+farrow8 = Sprite(49, 370, 'arrow.png')
 # переменные-"переключатели" движения для героя
 # враг
 enemy = Sprite(200, 10, 'WW.jpg')
 # переменные-"переключатели" движения для врага
 enemy.right = True
-enemy.up = False
+arrow.up = False
 hero.sp = 0.5
+enemy.sp = 0.5
 
 running = True
 pygame.key.set_repeat(1, 1)
@@ -62,43 +77,60 @@ while running:
                 hero.y -= 1*hero.sp
             elif e.key == pygame.K_DOWN:
                 hero.y += 1*hero.sp
+            elif e.key == pygame.K_SPACE:
+                if (arrow.x < 0) and (arrows > 0):
+                    arrow.y = hero.y
+                    arrow.x = hero.x
+                    arrow.up = 1
+                    arrows -= 1
     # задайте фоновый цвет
-    screen.fill([23, 198, 93])
 
+    screen.fill([23, 198, 93])
+    Score.fill([128, 22, 189])
     # движение персонажей - аналогично тому,
     # что делали с квадратом, но теперь по вертикали
+
     if hero.x > 370:
         hero.x = 370
     elif hero.x < 0:
         hero.x = 0
     if hero.y > 370:
         hero.y = 370
-    elif hero.y < 0:
-        hero.y = 0
-    if enemy.up == 1:
-        enemy.y -= 10
-        if enemy.y <= 0:
-            enemy.up = False
-            enemy.x = random.randint(0, 370)
+    elif hero.y < 250:
+        hero.y = 250
+    if enemy.x >= 370:
+        enemy.right = 0
+    elif enemy.x <= 0:
+        enemy.right = 1
+    if enemy.right == 1:
+        enemy.x += 10 * enemy.sp
     else:
-        enemy.y += 10
-        if enemy.y >= 370:
-            enemy.up = True
-
+        enemy.x -= 10 * enemy.sp
+    if arrow.up == 1:
+        arrow.y -= 50
+    if arrow.y < 0:
+        arrow.x = -100
+        arrow.y = -100
+        arrow.up = 0
     # enemy.x = random.randint(0, 400)
     # enemy.y = random.randint(0, 400)
 
     # столкновение персонажей
-    if intersect(hero.x, enemy.x, hero.y, enemy.y):
+    if intersect(arrow.x, enemy.x, arrow.y, enemy.y):
         hp -= 1
-        if hero.y > enemy.y:
-            enemy.up = 1
-        else:
-            enemy.up = 0
+        enemy.x = random.randint(0, 370)
+        enemy.sp = enemy.sp*2
+        arrow.x = -100
+        arrow.y = -100
+        arrow.up = 0
+        arrows += 3
+        scor += 1
 
     # отображение персонажей
     hero.render()
     enemy.render()
+    arrow.render()
+    text = mf.render(('Score' + str(scor)), 1, [255, 0, 0])
     if hp == 3:
         heart1.render()
         heart2.render()
@@ -108,9 +140,55 @@ while running:
         heart2.render()
     elif hp == 1:
         heart1.render()
+    if arrows >= 8:
+        farrow1.render()
+        farrow2.render()
+        farrow3.render()
+        farrow4.render()
+        farrow5.render()
+        farrow6.render()
+        farrow7.render()
+        farrow8.render()
+    elif arrows == 7:
+        farrow1.render()
+        farrow2.render()
+        farrow3.render()
+        farrow4.render()
+        farrow5.render()
+        farrow6.render()
+        farrow7.render()
+    elif arrows == 6:
+        farrow1.render()
+        farrow2.render()
+        farrow3.render()
+        farrow4.render()
+        farrow5.render()
+        farrow6.render()
+    elif arrows == 5:
+        farrow1.render()
+        farrow2.render()
+        farrow3.render()
+        farrow4.render()
+        farrow5.render()
+    elif arrows == 4:
+        farrow1.render()
+        farrow2.render()
+        farrow3.render()
+        farrow4.render()
+    elif arrows == 3:
+        farrow1.render()
+        farrow2.render()
+        farrow3.render()
+    elif arrows == 2:
+        farrow1.render()
+        farrow2.render()
+    elif arrows == 1:
+        farrow1.render()
 
     # отображение окна
-    window.blit(screen, [0, 0])
+    Score.blit(text, [0, 0])
+    window.blit(Score, [0, 0])
+    window.blit(screen, [0, 60])
     pygame.display.flip()
     pygame.time.delay(50)
 
