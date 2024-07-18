@@ -1,7 +1,7 @@
-# coding: utf8
 import pygame
 import random
 import time
+import sys
 
 xpos1 = int(input())
 ypos1 = int(input())
@@ -37,6 +37,52 @@ def intersect(s1_x, s2_x, s1_y, s2_y):
         return 0
 
 
+def load_menu():
+    items = [(100, 100, 'Continue', ([128, 0, 0]), ([255, 0, 0]), 0),
+             (100, 300, 'Exit', ([128, 0, 0]), ([255, 0, 0]), 1)]
+
+    pygame.key.set_repeat(0, 0)
+    pygame.mouse.set_visible(True)
+
+    done = False
+    item = 3
+    zxc = 0
+    while not done:
+        # Заливка всех поверхностей
+        screen.fill([23, 198, 93])
+        Score.fill([128, 22, 189])
+        for i in pygame.event.get():
+            if i.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if i.type == pygame.MOUSEBUTTONDOWN and i.button == 1:
+                if item == 0:
+                    done = True
+                    pygame.key.set_repeat(1, 1)
+                elif item == 1:
+                    pygame.quit()
+                    sys.exit()
+
+        pointer = pygame.mouse.get_pos()
+
+        for i in items:
+            if i[0] < pointer[0] < (i[0] + 200) and i[1] < pointer[1] < (i[1] + 50) and i[5] == 0:
+                item = i[5]
+            else:
+                item = 1
+
+        for i in items:
+            if item == i[5]:
+                screen.blit(mf.render(i[2], 1, i[4]), [i[0], i[1] - 40])
+            else:
+                screen.blit(mf.render(i[2], 1, i[3]), [i[0], i[1] - 40])
+
+        window.blit(Score, [0, 0])
+        window.blit(screen, [0, 40])
+        pygame.display.flip()
+
+
 # создание персонажей
 # герой
 hero = Sprite(xpos1, ypos1, 'WW.jpg')
@@ -60,6 +106,7 @@ enemy.right = True
 arrow.up = False
 hero.sp = 0.5
 enemy.sp = 0.5
+load_menu()
 
 running = True
 pygame.key.set_repeat(1, 1)
@@ -84,9 +131,9 @@ while running:
                     arrow.up = 1
                     arrows -= 1
     # задайте фоновый цвет
-
     screen.fill([23, 198, 93])
     Score.fill([128, 22, 189])
+
     # движение персонажей - аналогично тому,
     # что делали с квадратом, но теперь по вертикали
 
@@ -141,48 +188,20 @@ while running:
     elif hp == 1:
         heart1.render()
     if arrows >= 8:
-        farrow1.render()
-        farrow2.render()
-        farrow3.render()
-        farrow4.render()
-        farrow5.render()
-        farrow6.render()
-        farrow7.render()
         farrow8.render()
-    elif arrows == 7:
-        farrow1.render()
-        farrow2.render()
-        farrow3.render()
-        farrow4.render()
-        farrow5.render()
-        farrow6.render()
+    if arrows >= 7:
         farrow7.render()
-    elif arrows == 6:
-        farrow1.render()
-        farrow2.render()
-        farrow3.render()
-        farrow4.render()
-        farrow5.render()
+    if arrows >= 6:
         farrow6.render()
-    elif arrows == 5:
-        farrow1.render()
-        farrow2.render()
-        farrow3.render()
-        farrow4.render()
+    if arrows >= 5:
         farrow5.render()
-    elif arrows == 4:
-        farrow1.render()
-        farrow2.render()
-        farrow3.render()
+    if arrows >= 4:
         farrow4.render()
-    elif arrows == 3:
-        farrow1.render()
-        farrow2.render()
+    if arrows >= 3:
         farrow3.render()
-    elif arrows == 2:
-        farrow1.render()
+    if arrows >= 2:
         farrow2.render()
-    elif arrows == 1:
+    if arrows >= 1:
         farrow1.render()
 
     # отображение окна
@@ -193,3 +212,4 @@ while running:
     pygame.time.delay(50)
 
 pygame.quit()
+clck.ru/3BxiQb
