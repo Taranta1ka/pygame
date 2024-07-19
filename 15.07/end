@@ -1,0 +1,166 @@
+# coding: utf8
+import pygame
+import random
+import time
+import sys
+
+scor = 0
+# задааем размер окна, создаем окно размера size
+size = [400, 460]
+window = pygame.display.set_mode(size)
+# задаем имя - в кавычках, т.к. текст - это строка
+pygame.display.set_caption('My second file')
+pygame.font.init()
+mf = pygame.font.Font(None, 60)
+
+Score = pygame.Surface([400, 60])
+screen = pygame.Surface(size)
+
+
+class Sprite:
+    def __init__(self, xpos, ypos, filename):
+        self.x = xpos
+        self.y = ypos
+        self.bitmap = pygame.image.load(filename)
+
+    def render(self):
+        screen.blit(self.bitmap, (self.x, self.y))
+
+
+def intersect(s1_x, s2_x, s1_y, s2_y):
+    if (s1_x > s2_x - 15) and (s1_x < s2_x + 15) and (s1_y > s2_y - 9) and (s1_y < s2_y + 9):
+        return 1
+    else:
+        return 0
+def intersect1(s1_x1, s2_x1, s1_y1, s2_y1):
+    if (s1_x1 > s2_x1 - 15) and (s1_x1 < s2_x1 + 15) and (s1_y1 > s2_y1 - 9) and (s1_y1 < s2_y1 + 9):
+        return 1
+    else:
+        return 0
+
+def load_menu():
+    items = [(100, 100, 'Continue', ([128, 0, 0]), ([255, 0, 0]), 0),
+             (100, 300, 'Exit', ([128, 0, 0]), ([255, 0, 0]), 1)]
+
+    pygame.key.set_repeat(0, 0)
+    pygame.mouse.set_visible(True)
+
+    done = False
+    item = 3
+    while not done:
+        # Заливка всех поверхностей
+        screen.fill([23, 198, 93])
+        Score.fill([128, 22, 189])
+        for i in pygame.event.get():
+            if i.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
+                if item == 0:
+                    done = True
+                    pygame.key.set_repeat(1, 1)
+                elif item == 1:
+                    pygame.quit()
+                    sys.exit()
+
+        pointer = pygame.mouse.get_pos()
+
+        for i in items:
+            if i[0] < pointer[0] < (i[0] + 200) and i[1] < pointer[1] < (i[1] + 50) and i[5] == 0:
+                item = i[5]
+            else:
+                item = 1
+
+        for i in items:
+            if item == i[5]:
+                screen.blit(mf.render(i[2], 1, i[4]), [i[0], i[1] - 40])
+            else:
+                screen.blit(mf.render(i[2], 1, i[3]), [i[0], i[1] - 40])
+
+        window.blit(Score, [0, 0])
+        window.blit(screen, [0, 40])
+        pygame.display.flip()
+
+
+# создание персонажей
+# герой
+hero = Sprite(185, 360, 'WW.png')
+ball = Sprite(200, 200, 'ball.png')
+ball.up = True
+ball.right = True
+bricks = []
+br = 'Brick'
+for i in range(5):
+    b = []
+    for c in range(25):
+        b.append(Sprite(c*16, i*10, (br + '.png')))
+    br += '1'
+    bricks.append(b)
+# переменные-"переключатели" движения для врага
+hero.spx = 1
+hero.spy = -3
+
+running = True
+pygame.key.set_repeat(1, 1)
+while running:
+    # обработка событий
+    for e in pygame.event.get():
+        if e.type == pygame.QUIT:
+            running = False
+        if e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_ESCAPE:
+                load_menu()
+    # задайте фоновый цвет
+    screen.fill([23, 198, 93])
+    Score.fill([128, 22, 189])
+
+    # движение персонажей - аналогично тому,
+    # что делали с квадратом, но теперь по вертикали
+
+    pointer1 = pygame.mouse.get_pos()
+    hero.x = pointer1[0]
+    if ball.x >= 391:
+        hero.spx = hero.spx * -1
+    elif ball.x <= 0:
+        hero.spx = hero.spx * -1
+    if ball.y >= 391:
+        hero.spy = hero.spy * -1
+    elif ball.y <= 0:
+        hero.spy = hero.spy * -1
+    for i in bricks:
+        d = 0
+        for c in i:
+            if intersect(c.x, ball.x, c.y, ball.y):
+                i.pop(d)
+                scor += 1
+                if (c.x > ball.x - 15) and (c.x < ball.x + 15):
+                    hero.spx = hero.spx * -1
+                if (c.y > ball.y - 9) and (c.y < ball.y + 9):
+                    hero.spy = hero.spy * -1
+            d += 1
+    if intersect1(ball.x, hero.x, ball.y, hero.y):
+        hero.spy = hero.spy * -1
+    ball.x += 1 * hero.spx
+    ball.y += 1 * hero.spy
+    # enemy.x = random.randint(0, 400)
+    # enemy.y = random.randint(0, 400)
+
+    # столкновение персонажей
+    # отображение персонажей
+    hero.render()
+    ball.render()
+    for i in bricks:
+        for c in i:
+            c.render()
+
+    text = mf.render(('Score' + str(scor)), 1, [255, 0, 0])
+
+    # отображение окна
+    Score.blit(text, [0, 0])
+    window.blit(Score, [0, 0])
+    window.blit(screen, [0, 60])
+    pygame.display.flip()
+    pygame.time.delay(50)
+
+pygame.quit()
